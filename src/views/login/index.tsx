@@ -1,28 +1,22 @@
-import {Component, Vue} from 'vue-property-decorator';
-import {loginReq} from '@/api/user';
-import Cookies from 'js-cookie';
+import {Component, Vue, Emit, Prop, Watch} from 'vue-property-decorator';
+import {State, Action} from 'vuex-class';
 
 @Component
 export default class LoginPage extends Vue {
+
+  // 这里通过@Action('loginAction')装饰器指定loginAction是store里的loginAction方法
+  @Action('loginAction') public loginAction: any;
 
   private username: string = '';
   private password: string = '';
 
   public login() {
     const data = {username: this.username, password: this.password};
-    loginReq(data).then((res) => {
-      const {data: {code, msg}} = res;
-      if (code === 0) {
-        // 这里实际开发中不会在这个地方写，而是抽离到路由守卫或store中
-        // 而且一般这个值不会是写死的字符串，而是从服务端返回的随机且唯一的字符串
-        Cookies.set('token', 'value');
-
-        this.$router.push('/home');
-      } else {
-        // TODO tslint:disable-next-line:no-console
-        // tslint:disable-next-line:no-console
-        console.error(msg);
-      }
+    // 然后这里就可以直接调用loginAction方法
+    // 效果和this.$store.dispatch('loginActions', { 参数 })是一样的
+    this.loginAction(data).then(() => {
+      // 在store中的loginActions定义中，执行resolve方法的时机就是这里then中传入的这个函数执行的时机
+      this.$router.push('/home'); // 在这跳转到home页
     });
   }
 

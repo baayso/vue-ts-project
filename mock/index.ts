@@ -27,13 +27,28 @@ interface PostRequestInterface {
 }
 
 Mock.mock(/\/api\/user\/login/, loginRes);
+Mock.mock(/\/api\/user\/getInfo/, getInfo);
 
 function loginRes(req: PostRequestInterface) {
   const {username, password} = JSON.parse(req.body);
 
   if (username === 'baayso' && password === 'baayso') {
-    return success('登录成功');
+    return success('登录成功', {userId: '101', token: 'i-am-token'});
   } else {
     return error(1001, '用户名或密码错误');
   }
+}
+
+function getInfo(req: PostRequestInterface) {
+  const {userId} = JSON.parse(req.body);
+  if (userId === '101') {
+    return success('获取用户信息成功', {
+      username: 'baayso',
+      avatar: '',
+      email: 'baayso@baayso.com',
+    });
+  } else {
+    return error(1002, '用户信息不存在');
+  }
+
 }
